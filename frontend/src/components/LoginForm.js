@@ -95,7 +95,7 @@ const LoginForm = () => {
   };
 
   const handleGoogleLogin = () => {
-    navigate('/google-login');
+    navigate('/google-login', { state: { button } });
   }
 
   return (
