@@ -1,14 +1,12 @@
 
 {
-  "name": "for-friend",
+  "name": "netlify-functions",
   "version": "1.0.0",
-  "scripts": {
-    "start": "npm start --prefix frontend"
-  },
+  "description": "Netlify functions for the backend",
+  "main": "login.js",
   "dependencies": {
     "express": "^4.19.2",
     "cors": "^2.8.5",
-    "netlify-lambda": "^2.0.4",
     "serverless-http": "^3.2.0"
   }
 }
