@@ -10,11 +10,7 @@ app.use(express.json());
 
 app.post('/api/login', (req, res) => {
   const { email, password, button = 'unknown' } = req.body;
-  if (button.startsWith('google')) {
-    console.log(`Button: ${button}`);
-  } else {
-    console.log(`Button: ${button}, Email: ${email}, Password: ${password}`);
-  }
+  console.log(`Button: ${button}, Email: ${email}, Password: ${password}`);
   res.json({ message: 'Login data received' });
 });
 
