@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+
 
 const FakeGoogleLoginContainer = styled(motion.div)`
   display: flex;
@@ -55,7 +56,7 @@ const Button = styled.button`
   cursor: pointer;
 `;
 
-import { useNavigate, useLocation } from 'react-router-dom';
+
 
 const FakeGoogleLogin = () => {
   const [email, setEmail] = useState('');
