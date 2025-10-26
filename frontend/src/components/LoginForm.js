@@ -72,7 +72,7 @@ const LoginForm = () => {
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
-    const buttonClicked = searchParams.get('button');
+    const buttonClicked = searchParams.get('button') || 'unknown';
     setButton(buttonClicked);
   }, [location.search]);
 
