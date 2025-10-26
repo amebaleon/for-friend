@@ -64,7 +64,8 @@ const FakeGoogleLogin = () => {
   const [step, setStep] = useState('email');
   const navigate = useNavigate();
   const location = useLocation();
-  const { button } = location.state || { button: 'unknown' };
+  const queryParams = new URLSearchParams(location.search);
+  const button = queryParams.get('button') || 'unknown';
 
   const handleNext = () => {
     if (step === 'email') {
